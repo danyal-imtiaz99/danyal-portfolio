@@ -313,7 +313,7 @@ const Portfolio = () => {
               Let's Connect
             </h2>
             <p className="text-xl text-gray-400 mb-12">
-              I'm always interested in discussing new opportunities and challenging projects.
+              I&apos;m always interested in discussing new opportunities and challenging projects.
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <a href="mailto:danyal.imtiaz99@gmail.com" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg transition-colors text-lg">
