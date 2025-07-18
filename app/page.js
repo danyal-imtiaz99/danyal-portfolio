@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { Analytics } from "@vercel/analytics/next";
 import { Github, Linkedin, Twitter, Mail, Phone, MapPin, ExternalLink, Code, Database, Server, Award, Calendar, ChevronRight, Star } from 'lucide-react';
 
 const Portfolio = () => {
@@ -340,6 +341,7 @@ const Portfolio = () => {
             </p>
           </div>
         </footer>
+        <Analytics />
       </div>
   );
 };
