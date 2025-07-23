@@ -7,10 +7,30 @@ import { Github, Linkedin, Twitter, Mail, Phone, MapPin, ExternalLink, Code, Dat
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isVisible, setIsVisible] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
+    loadProjects();
   }, []);
+
+  // Load projects from API
+  const loadProjects = async () => {
+    try {
+      const response = await fetch('/api/projects');
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
+      } else {
+        console.error('Failed to load projects');
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const skills = {
     "Programming Languages": ["Java", "C++", "Python", "C#", "JavaScript", "SQL"],
@@ -58,33 +78,6 @@ const Portfolio = () => {
     }
   ];
 
-  const projects = [
-    {
-      title: "URL Shortener Platform",
-      tech: "Java, Spring Boot, React, PostgreSQL, Hibernate, JPA, Shell",
-      description: "Full-stack URL shortening service built from scratch and deployed to production with automated CI/CD pipeline",
-      highlights: [
-        "Built complete backend and frontend architecture using modern tech stack",
-        "Implemented automated CI/CD pipeline with GitHub Actions for seamless deployment",
-        "Deployed to production with version control integration and automated testing",
-        "Optimized algorithms for efficient URL processing and database operations"
-      ],
-      status: "🚀 Live & In Progress"
-    },
-    {
-      title: "Monitoring Dashboard for Reports",
-      tech: "Java, Spring MVC, RESTful APIs, JavaScript, Real-time Processing",
-      description: "Enterprise-grade monitoring solution providing real-time system metrics and automated reporting capabilities",
-      highlights: [
-        "Developed comprehensive API endpoints for system monitoring and analytics",
-        "Created real-time dashboard with live data visualization and alerting",
-        "Built automated report generation system with customizable metrics",
-        "Implemented scalable architecture supporting multiple data sources"
-      ],
-      status: "✅ Production Ready"
-    }
-  ];
-
   const certifications = [
     "ProgrammingExpert.io Complete Certification (2024)",
     "Amazon Software Development Principles (2025) - Ongoing",
@@ -101,6 +94,17 @@ const Portfolio = () => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Get status display for projects
+  const getStatusDisplay = (status) => {
+    switch (status) {
+      case 'live': return '🚀 Live & Production Ready';
+      case 'completed': return '✅ Completed';
+      case 'in-progress': return '🔄 In Progress';
+      case 'upcoming': return '📅 Upcoming';
+      default: return '✅ Production Ready';
     }
   };
 
@@ -261,34 +265,76 @@ const Portfolio = () => {
           </div>
         </section>
 
-        {/* Projects Section */}
+        {/* Projects Section - Now Dynamic */}
         <section id="projects" className="py-20 bg-slate-800/50">
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Technical Projects
             </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {projects.map((project, index) => (
-                  <div key={index} className="bg-slate-900/50 p-6 rounded-lg border border-slate-700 hover:border-blue-500 transition-colors">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-bold text-blue-400">{project.title}</h3>
-                      <span className="text-sm bg-green-900/30 text-green-300 px-2 py-1 rounded border border-green-800">
-                    {project.status}
-                  </span>
-                    </div>
-                    <p className="text-gray-400 mb-4 font-mono text-sm">{project.tech}</p>
-                    <p className="text-gray-300 mb-4 leading-relaxed">{project.description}</p>
-                    <div className="space-y-2">
-                      {project.highlights.map((highlight, i) => (
-                          <div key={i} className="flex gap-2">
-                            <Star className="text-yellow-400 flex-shrink-0 mt-1" size={14} />
-                            <p className="text-gray-300 text-sm">{highlight}</p>
-                          </div>
-                      ))}
-                    </div>
-                  </div>
-              ))}
-            </div>
+
+            {loading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+                  <p className="text-gray-400">Loading projects...</p>
+                </div>
+            ) : (
+                <div className="grid md:grid-cols-2 gap-8">
+                  {projects.map((project, index) => (
+                      <div key={project.id} className="bg-slate-900/50 p-6 rounded-lg border border-slate-700 hover:border-blue-500 transition-colors">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-xl font-bold text-blue-400">{project.title}</h3>
+                          <span className="text-sm bg-green-900/30 text-green-300 px-2 py-1 rounded border border-green-800">
+                          {getStatusDisplay(project.status)}
+                        </span>
+                        </div>
+                        <p className="text-gray-400 mb-4 font-mono text-sm">{project.tech.join(', ')}</p>
+                        <p className="text-gray-300 mb-4 leading-relaxed">{project.description}</p>
+
+                        {project.highlights && project.highlights.length > 0 && (
+                            <div className="space-y-2 mb-4">
+                              {project.highlights.map((highlight, i) => (
+                                  <div key={i} className="flex gap-2">
+                                    <Star className="text-yellow-400 flex-shrink-0 mt-1" size={14} />
+                                    <p className="text-gray-300 text-sm">{highlight}</p>
+                                  </div>
+                              ))}
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-4 pt-4 border-t border-slate-700">
+                          {project.githubUrl && (
+                              <a
+                                  href={project.githubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors"
+                              >
+                                <Code size={16} />
+                                <span className="text-sm">Code</span>
+                              </a>
+                          )}
+                          {project.liveUrl && (
+                              <a
+                                  href={project.liveUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors"
+                              >
+                                <ExternalLink size={16} />
+                                <span className="text-sm">Live Demo</span>
+                              </a>
+                          )}
+                        </div>
+                      </div>
+                  ))}
+                </div>
+            )}
+
+            {!loading && projects.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-400 text-lg">No projects found. Please check back later.</p>
+                </div>
+            )}
 
             {/* Certifications */}
             <div className="mt-16">
