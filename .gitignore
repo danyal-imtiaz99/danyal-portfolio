@@ -46,4 +46,4 @@ next-env.d.ts
 .env
 
 # Admin data (optional - keeps your projects data private)
-data/projects.json
+projectData/projects.json
